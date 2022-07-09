@@ -1,6 +1,6 @@
 {
   "name": "logseq-logtero-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create pages for Zotero items using custom page titles and properties",
   "main": "dist/index.html",
   "targets": {

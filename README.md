@@ -49,13 +49,13 @@
         - {{itemType}}: the type of item it is (e.g. book, journal article, conference paper)
         - {{journal}}: the journal the item is in
         - {{keywords}}: the keywords associated with the item in Zotero
-        - {{localLibrary}}: the local link to the item in library (e.g. `zotero://select/library/items/...`)
-        - {{pages}}: the pages of the item
+        - {{localLibrary}}: the local link to the item in your Zotero library (e.g. `zotero://select/library/items/...`)
+        - {{pages}}: the total number of pages or the range of pages for the item
         - {{pdf}}: format - `![{{citekey}}]({{filePath}})`
         - {{title}}: the title of the item
         - {{url}}: the original link to the item
         - {{volume}}: the volume of the journal the item is in
-        - {{webLibrary}}: the web link to the item in library (e.g. `http://zotero.org/users/.../items/...`)
+        - {{webLibrary}}: the web link to the item in your Zotero library (e.g. `http://zotero.org/users/.../items/...`)
         - {{year}}: the publication year of the item
         ---
         - Example templates

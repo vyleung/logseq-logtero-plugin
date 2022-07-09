@@ -281,17 +281,18 @@ function zoteroTemplates(item) {
         zotero_authors = "";
       }
       else if (page_title_variable == "{{citekey}}") {
-        (selected_zotero_item_citekey) ? page_title = page_title.replace(page_title_variable, selected_zotero_item_citekey) : page_title = page_title.replace(page_title_variable, "N/A");
+        (selected_zotero_item_citekey) ? page_title = page_title.replace(page_title_variable, selected_zotero_item_citekey) : page_title = page_title.replace(page_title_variable, "NA");
       }
       else if (page_title_variable == "{{title}}") {
         selected_zotero_item_title = zotero_item.title;
+        selected_zotero_item_title = selected_zotero_item_title.replace("/", "_");
 
-        (selected_zotero_item_title) ? page_title = page_title.replace(page_title_variable, selected_zotero_item_title) : page_title = page_title.replace(page_title_variable, "N/A");
+        (selected_zotero_item_title) ? page_title = page_title.replace(page_title_variable, selected_zotero_item_title) : page_title = page_title.replace(page_title_variable, "NA");
       }
       else if (page_title_variable == "{{year}}") {
         formatZoteroDate(zotero_item.date);
 
-        (zotero_year) ? page_title = page_title.replace(page_title_variable, zotero_year) : page_title = page_title.replace(page_title_variable, "N/A");
+        (zotero_year) ? page_title = page_title.replace(page_title_variable, zotero_year) : page_title = page_title.replace(page_title_variable, "NA");
 
         // clear year
         zotero_year = "";
@@ -302,12 +303,15 @@ function zoteroTemplates(item) {
   function setProperties(property_key, property_value) {
     if ((property_key == "abstractNote") || (property_value == "abstractNote")) {
       let zotero_abstract = zotero_item.abstractNote;
-      (zotero_abstract) ? page_properties[property_key] = zotero_abstract : page_properties[property_key] = "N/A";
+
+      // wrap abstract in quotes to prevent auto-linking
+      (zotero_abstract) ? page_properties["abstract"] = `"${zotero_abstract}"` : page_properties["abstract"] = "NA";
     }
     else if ((property_key == "authors") || (property_value == "authors")) {
       formatZoteroAuthors(zotero_item.creators, "complete");
 
-      (zotero_authors) ? page_properties[property_key] = zotero_authors : page_properties[property_key] = "N/A";
+      // wrap authors in quotes to prevent auto-linking
+      (zotero_authors) ? page_properties[property_key] = `"${zotero_authors}"` : page_properties[property_key] = "NA";
 
       // clear authors
       zotero_authors = "";
@@ -319,18 +323,18 @@ function zoteroTemplates(item) {
       (Object.entries(zotero_collections)).forEach(zotero_collection => {
         zotero_collection.forEach(collection => {
           if (collection.items) {
-            ((collection.items).includes(zotero_item_id)) ? page_properties[property_key] = collection.name : page_properties[property_key] = "N/A";
+            ((collection.items).includes(zotero_item_id)) ? page_properties[property_key] = collection.name : page_properties[property_key] = "NA";
           }
         });
       });
     }
     else if ((property_key == "citekey") || (property_value == "citekey")) {
       let zotero_citekey = zotero_item.citekey;
-      (zotero_citekey) ? page_properties[property_key] = zotero_citekey : page_properties[property_key] = "N/A";
+      (zotero_citekey) ? page_properties[property_key] = zotero_citekey : page_properties[property_key] = "NA";
     }
     else if ((property_key == "doi") || (property_value == "doi")) {
       let zotero_DOI = zotero_item.DOI;
-      (zotero_DOI) ? page_properties[property_key] = zotero_DOI : page_properties[property_key] = "N/A";
+      (zotero_DOI) ? page_properties[property_key] = zotero_DOI : page_properties[property_key] = "NA";
     }
     else if ((property_key == "filePath") || (property_value == "filePath") || (property_key == "pdf") || (property_value == "pdf")) {
       let zotero_attachments = zotero_item.attachments;
@@ -340,10 +344,10 @@ function zoteroTemplates(item) {
           let zotero_file_path = attachment.path;
           if ((attachment.title != "Snapshot") && (zotero_file_path) && (zotero_file_path.slice(-3) == "pdf")) {
             if ((property_key == "filePath")) {
-              (zotero_file_path) ? page_properties["file-path"] = zotero_file_path : page_properties[property_key] = "N/A";
+              (zotero_file_path) ? page_properties["file-path"] = zotero_file_path : page_properties["file-path"] = "NA";
             }
             else {
-              (zotero_file_path) ? page_properties[property_key] = `![${attachment.title}](${zotero_file_path})` : page_properties[property_key] = "N/A";
+              (zotero_file_path) ? page_properties[property_key] = `![${attachment.title}](${zotero_file_path})` : page_properties[property_key] = "NA";
             }
           }
         });
@@ -351,15 +355,15 @@ function zoteroTemplates(item) {
     }
     else if ((property_key == "issue") || (property_value == "issue")) {
       let zotero_issue = zotero_item.issue;
-      (zotero_issue) ? page_properties[property_key] = zotero_issue : page_properties[property_key] = "N/A";
+      (zotero_issue) ? page_properties[property_key] = zotero_issue : page_properties[property_key] = "NA";
     }
     else if ((property_key == "itemType") || (property_value == "itemType")) {
       let zotero_item_type = zotero_item.itemType;
-      (zotero_item_type) ? page_properties["item-type"] = zotero_item_type : page_properties["item-type"] = "N/A";
+      (zotero_item_type) ? page_properties["item-type"] = zotero_item_type : page_properties["item-type"] = "NA";
     }
     else if ((property_key == "journal") || (property_value == "journal")) {
       let zotero_journal = zotero_item.publicationTitle;
-      (zotero_journal) ? page_properties[property_key] = zotero_journal : page_properties[property_key] = "N/A";
+      (zotero_journal) ? page_properties[property_key] = zotero_journal : page_properties[property_key] = "NA";
     }
     else if ((property_key == "keywords") || (property_value == "keywords")) {
       let zotero_tags  = zotero_item.tags;
@@ -374,12 +378,12 @@ function zoteroTemplates(item) {
             keywords += `${zotero_tags[i].tag}`;
           }
         }
-        (keywords) ? page_properties[property_key] = keywords : page_properties[property_key] = "N/A";
+        (keywords) ? page_properties[property_key] = keywords : page_properties[property_key] = "NA";
       }
     }
     else if ((property_key == "localLibrary") || (property_value == "localLibrary")) {
       let open_in_zotero = zotero_item.select;
-      (open_in_zotero) ? page_properties["local-library"] = `[Local library](${open_in_zotero})` : page_properties["local-library"] = "N/A";
+      (open_in_zotero) ? page_properties["local-library"] = `[Local library](${open_in_zotero})` : page_properties["local-library"] = "NA";
     }
     else if ((property_key == "pages") || (property_value == "pages")) {
       let zotero_page_numbers = zotero_item.pages;
@@ -392,29 +396,29 @@ function zoteroTemplates(item) {
         page_properties[property_key] = zotero_total_num_pages;
       }
       else {
-        page_properties[property_key] = "N/A";
+        page_properties[property_key] = "NA";
       }
     }
     else if ((property_key == "title") || (property_value == "title")) {
       let zotero_title = zotero_item.title;
-      (zotero_title) ? page_properties[property_key] = zotero_title : page_properties[property_key] = "N/A";
+      (zotero_title) ? page_properties[property_key] = zotero_title : page_properties[property_key] = "NA";
     }
     else if ((property_key == "url") || (property_value == "url")) {
       let zotero_URL = zotero_item.url;
-      (zotero_URL) ? page_properties[property_key] = zotero_URL : page_properties[property_key] = "N/A";
+      (zotero_URL) ? page_properties[property_key] = zotero_URL : page_properties[property_key] = "NA";
     }
     else if ((property_key == "volume") || (property_value == "volume")) {
       let zotero_volume = zotero_item.volume;
-      (zotero_volume) ? page_properties[property_key] = zotero_volume : page_properties[property_key] = "N/A";
+      (zotero_volume) ? page_properties[property_key] = zotero_volume : page_properties[property_key] = "NA";
     }
     else if ((property_key == "webLibrary") || (property_value == "webLibrary")) {
       let zotero_URI = zotero_item.uri;
-      (zotero_URI) ? page_properties["web-library"] = `[Web library](${zotero_URI})` : page_properties["web-library"] = "N/A";
+      (zotero_URI) ? page_properties["web-library"] = `[Web library](${zotero_URI})` : page_properties["web-library"] = "NA";
     }
     else if ((property_key == "year") || (property_value == "year")) {
       formatZoteroDate(zotero_item.date);
 
-      (zotero_year) ? page_properties[property_key] = zotero_year : page_properties[property_key] = "N/A";
+      (zotero_year) ? page_properties[property_key] = zotero_year : page_properties[property_key] = "NA";
 
       // clear year
       zotero_year = "";
@@ -548,7 +552,7 @@ function formatZoteroAuthors(authors, type) {
       }
     }
     else {
-      zotero_authors = "N/A";
+      zotero_authors = "NA";
     }
   }
 
@@ -569,7 +573,7 @@ function formatZoteroDate(date) {
         });
       }
       else {
-        zotero_year = "N/A";
+        zotero_year = "NA";
       }
     }
     else {
@@ -577,7 +581,7 @@ function formatZoteroDate(date) {
     }
   }
   else {
-    zotero_year = "N/A";
+    zotero_year = "NA";
   }
 
   return zotero_year;
