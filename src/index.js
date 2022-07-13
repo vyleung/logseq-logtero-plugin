@@ -401,7 +401,7 @@ function zoteroTemplates(item) {
     }
     else if ((property_key == "title") || (property_value == "title")) {
       let zotero_title = zotero_item.title;
-      (zotero_title) ? page_properties[property_key] = zotero_title : page_properties[property_key] = "NA";
+      (zotero_title) ? page_properties["zotero-title"] = zotero_title : page_properties["zotero-title"] = "NA";
     }
     else if ((property_key == "url") || (property_value == "url")) {
       let zotero_URL = zotero_item.url;
