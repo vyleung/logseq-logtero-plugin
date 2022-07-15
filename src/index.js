@@ -304,6 +304,9 @@ function zoteroTemplates(item) {
     if ((property_key == "abstractNote") || (property_value == "abstractNote")) {
       let zotero_abstract = zotero_item.abstractNote;
 
+      // removes extra whitespace and line breaks
+      zotero_abstract = zotero_abstract.trim().replace(/\s{2,}/gu, " ").replace(/[\r\n]/g, " ");
+
       // wrap abstract in quotes to prevent auto-linking
       (zotero_abstract) ? page_properties["abstract"] = `"${zotero_abstract}"` : page_properties["abstract"] = "NA";
     }
