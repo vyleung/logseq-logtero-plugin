@@ -15,21 +15,21 @@ const settings = [
     title: "Template for the new Zotero page title (required)",
     description: "This is the template that will be used as the new Zotero page's title. Please see the README for the available variables (e.g. {{authors}} ({{year}}) {{title}})",
     type: "string",
-    default: ""
+    default: "{{authors}} ({{year}}) {{title}})"
   },
   {
     key: "PagePropertiesTemplate",
     title: "Template for properties in the new Zotero page (optional)",
     description: "This is the template that will be used as the properties in the new Zotero page. Please see the README for the list of variables and separate each property with a comma (e.g. {{pdf}}, {{pages}}, {{url}})",
     type: "string",
-    default: ""
+    default: "{{authors}}, {{abstract}}, {{pdf}}, {{localLibrary}}, {{year}}"
   },
   {
     key: "CustomPageProperties",
     title: "Custom properties in the new Zotero page (optional)",
     description: "These are custom properties that will be included in the new Zotero page after the Zotero properties. Each property key can have more than 1 value (e.g. tags:: tag1, tag2, tag3). To include more than 1 property, separate each property with a semi-colon (e.g. category:: zotero, reading-list; status:: to-read). Leave the property value empty if you want to fill it in yourself later (e.g. rating::)",
     type: "string",
-    default: ""
+    default: "category:: zotero"
   },
   {
     key: "KeyboardShortcut",
