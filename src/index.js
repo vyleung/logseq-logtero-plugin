@@ -482,7 +482,11 @@ function zoteroTemplates(item) {
       logseq.Editor.insertAtEditingCursor(`[[${page_title}]]`);
       logseq.Editor.exitEditingMode();
     }
-    else {
+    else if (input_type == "slash command - pandoc citation") {
+      let pandoc_citation = `[${zotero_item.citekey}]`;
+      logseq.Editor.insertAtEditingCursor(pandoc_citation);
+    }
+    else if (input_type == "command palette") {
       logseq.Editor.createPage(page_title, page_properties, {
           redirect: true,
           createFirstBlock: false
@@ -682,12 +686,20 @@ const main = async () => {
     }
   }, 50);
 
-  // slash command
-  logseq.Editor.registerSlashCommand("Logtero: Add a Zotero item", async () => {
-    input_type = "slash command";
-    logseq.showMainUI();
-    search_bar.focus();
-  });
+  // slash commands
+  (function registerSlashCommands() {    
+    logseq.Editor.registerSlashCommand("Logtero: Add a Zotero item", async () => {
+      input_type = "slash command";
+      logseq.showMainUI();
+      search_bar.focus();
+    });
+  
+    logseq.Editor.registerSlashCommand("Logtero: Insert Pandoc citation", async () => {
+      input_type = "slash command - pandoc citation";
+      logseq.showMainUI();
+      search_bar.focus();
+    });
+  })();
 
   // command palette
   logseq.App.registerCommandPalette({
