@@ -214,6 +214,31 @@ function searchZoteroItems(e) {
           // clear year
           zotero_year = "";
         }
+
+        // add a check mark icon next to the search result if a page for the zotero item already exists
+        logseq.Editor.getAllPages().then(all_existing_pages => {
+          // search through each existing page in the graph
+          all_existing_pages.forEach(existing_page => {
+            logseq.Editor.getPageBlocksTree(existing_page.name).then(page_blocks => {
+              // if the page has page properties and one of them is the "citekey" property
+              if ((page_blocks.length > 0) && (page_blocks[0].properties != undefined)) {
+                if (page_blocks[0].properties.citekey != undefined) {
+                  filtered_search.forEach(filtered_search_item => {
+                    // if the filtered search item's ID matches the citekey, add the check mark icon
+                    if (filtered_search_item.id == page_blocks[0].properties.citekey) {
+                      filtered_search_item.children[0].innerHTML += `<div class="check-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#009900" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                          <path d="M5 12l5 5l10 -10" />
+                        </svg>
+                      </div>`;
+                    }
+                  });
+                }
+              }
+            });
+          });
+        });
       }
       else if ((filtered_zotero_search_results.length == 0) && (search_bar.value != "")) {
         // no results found
