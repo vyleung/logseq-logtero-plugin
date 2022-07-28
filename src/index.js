@@ -196,12 +196,20 @@ function searchZoteroItems(e) {
           });
 
           search_result_item.addEventListener("click", function (e) {
+            if ((e.target.className == "title") || (e.target.className == "info")) {
+              createZoteroPage(e);
+            }
+            else if (((e.target.nodeName == "path") && (e.target.parentElement.parentElement.className == "zotero-icon")) || ((e.target.nodeName == "svg") && (e.target.parentElement.className == "zotero-icon"))) {
+              e.stopPropagation();
+            }
+            else if (((e.target.nodeName == "path") && (e.target.parentElement.parentElement.className == "check-icon")) || ((e.target.nodeName == "svg") && (e.target.parentElement.className == "check-icon"))) {
+              e.stopPropagation();
+            }
             exitSearch();
-            createZoteroPage(e);
           });
 
           search_result_title_container.appendChild(search_result_title);
-          search_result_title_container.innerHTML += `<a class="zotero-icon" href="${zotero_item_link}" onclick="event.stopPropagation();" title="Open item in Zotero">
+          search_result_title_container.innerHTML += `<a class="zotero-icon" title="Open item in Zotero" href="${zotero_item_link}">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-z" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="#CC2936" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
               <path d="M7 4h10l-10 16h10" />
@@ -223,26 +231,31 @@ function searchZoteroItems(e) {
           zotero_year = "";
         }
         // add a check mark icon next to the search result if a page for the zotero item already exists
-        logseq.Editor.getAllPages().then(all_existing_pages => {
-          // search through each existing page in the graph
-          all_existing_pages.forEach(existing_page => {
-            logseq.Editor.getPageBlocksTree(existing_page.name).then(page_blocks => {
-              // if the page has page properties and one of them is the "citekey" property
-              if ((page_blocks.length > 0) && (page_blocks[0].properties != undefined)) {
-                if (page_blocks[0].properties.citekey != undefined) {
-                  filtered_search.forEach(filtered_search_item => {
-                    // if the filtered search item's ID matches the citekey, add the check mark icon
-                    if (filtered_search_item.id == page_blocks[0].properties.citekey) {
-                      filtered_search_item.children[0].innerHTML += `<div class="check-icon" title="Open item in Logseq">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="26" height="26" viewBox="0 0 24 24" stroke-width="2" stroke="#009900" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                          <path d="M5 12l5 5l10 -10" />
-                        </svg>
-                      </div>`;
-                    }
-                  });
+        logseq.App.getCurrentGraph().then(current_graph => {
+          const graph_name = current_graph.name;
+
+          logseq.Editor.getAllPages().then(all_existing_pages => {
+            // search through each existing page in the graph
+            all_existing_pages.forEach(existing_page => {
+              let page_name = existing_page.name;
+              logseq.Editor.getPageBlocksTree(page_name).then(page_blocks => {
+                // if the page has page properties and one of them is the "citekey" property
+                if ((page_blocks.length > 0) && (page_blocks[0].properties != undefined)) {
+                  if (page_blocks[0].properties.citekey != undefined) {
+                    filtered_search.forEach(filtered_search_item => {
+                      // if the filtered search item's ID matches the citekey, add the check mark icon
+                      if (filtered_search_item.id == page_blocks[0].properties.citekey) {
+                        filtered_search_item.children[0].innerHTML += `<a class="check-icon" title="Open item in Logseq" href="logseq://graph/${graph_name}?page=${page_name}">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="26" height="26" viewBox="0 0 24 24" stroke-width="2" stroke="#009900" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M5 12l5 5l10 -10" />
+                          </svg>
+                        </a>`;
+                      }
+                    });
+                  }
                 }
-              }
+              });
             });
           });
         });
