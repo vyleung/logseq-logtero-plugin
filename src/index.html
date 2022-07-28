@@ -60,7 +60,7 @@
       li {
         list-style-type: none;
         padding: 0.25em 0.5em;
-        line-height: 1.35;
+        line-height: 1.5;
       }
       li.search-result:hover, li.selected {
         background: var(--li-hover-background);
@@ -71,11 +71,16 @@
       li > .title {
         font-weight: 700;
       }
-      .check-icon {
+      .zotero-icon, .check-icon {
         position: fixed;
         display: inline-block;
-        margin-top: -0.125em;
-        margin-left: 0.35em;
+      }
+      .zotero-icon {
+        margin-top: 0.125em;
+        margin-left: 0.5em;
+      }
+      .check-icon {
+        margin-left: 2em;
       }
     </style>
   </head>
@@ -84,9 +89,10 @@
     <div class="row" id="container">
       <div>
         <div id="search-bar-container">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-z" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="#CC2936" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <path d="M7 4h10l-10 16h10" />
+            <circle cx="10" cy="10" r="7" />
+            <line x1="21" y1="21" x2="15" y2="15" />
           </svg>
 
           <input id="search-bar" type="text" placeholder="Search for a Zotero item"></input>

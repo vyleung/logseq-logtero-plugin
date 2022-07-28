@@ -142,6 +142,7 @@ function searchZoteroItems(e) {
   let zotero_item;
   let zotero_item_citeKey;
   let zotero_item_title;
+  let zotero_item_link;
   let search_result_item;
   let search_result_title_container;
   let search_result_title;
@@ -162,6 +163,7 @@ function searchZoteroItems(e) {
           
           zotero_item_citeKey = zotero_item.citekey;
           zotero_item_title = zotero_item.title;
+          zotero_item_link = zotero_item.select;
         
           // format zotero authors
           formatZoteroAuthors(zotero_item.creators, "condense");
@@ -199,6 +201,12 @@ function searchZoteroItems(e) {
           });
 
           search_result_title_container.appendChild(search_result_title);
+          search_result_title_container.innerHTML += `<a class="zotero-icon" href="${zotero_item_link}" onclick="event.stopPropagation();" title="Open item in Zotero">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-z" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="#CC2936" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M7 4h10l-10 16h10" />
+            </svg>
+          </a>`
           search_result_description_container.appendChild(search_result_description);
 
           search_result_item.append(search_result_title_container, search_result_description_container);
@@ -214,7 +222,6 @@ function searchZoteroItems(e) {
           // clear year
           zotero_year = "";
         }
-
         // add a check mark icon next to the search result if a page for the zotero item already exists
         logseq.Editor.getAllPages().then(all_existing_pages => {
           // search through each existing page in the graph
@@ -226,8 +233,8 @@ function searchZoteroItems(e) {
                   filtered_search.forEach(filtered_search_item => {
                     // if the filtered search item's ID matches the citekey, add the check mark icon
                     if (filtered_search_item.id == page_blocks[0].properties.citekey) {
-                      filtered_search_item.children[0].innerHTML += `<div class="check-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="#009900" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      filtered_search_item.children[0].innerHTML += `<div class="check-icon" title="Open item in Logseq">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="26" height="26" viewBox="0 0 24 24" stroke-width="2" stroke="#009900" fill="none" stroke-linecap="round" stroke-linejoin="round">
                           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                           <path d="M5 12l5 5l10 -10" />
                         </svg>
