@@ -1,5 +1,8 @@
 import "@logseq/libs";
 import { clearDriftless, setDriftlessTimeout } from "driftless";
+import * as FilePond from "filepond";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import "filepond/dist/filepond.min.css";
 import Fuse from "fuse.js";
 
 const settings = [
@@ -44,6 +47,8 @@ const search_bar = document.getElementById("search-bar");
 let search_results = document.getElementById("search-results");
 let input_type;
 let typingTimer;
+let imported_files_total;
+let imported_files_index = 0;
 let search_index = 0;
 let filtered_search;
 let selected_search_item;
@@ -55,6 +60,51 @@ let selected_zotero_item_citekey = "";
 let zotero_authors = "";
 let zotero_year = "";
 
+// bulk import using filepond
+const filepond_container = document.querySelector("#filepond-container");
+const filepond_input = document.querySelector("#filepond-input");
+
+// register filepond's file validation plugin
+FilePond.registerPlugin(FilePondPluginFileValidateType);
+
+// create filepond drag and drop zone
+const filepond_dropzone = FilePond.create(filepond_input, {
+  allowMultiple: true,
+  allowReorder: true,
+  labelIdle: 'Drag & drop your PDFs from Zotero or <span class="filepond--label-action">Browse</span>',
+  acceptedFileTypes: ["application/pdf"]
+});
+
+// bulk import zotero items
+const bulk_import_button = document.querySelector("#bulk-import-button");
+bulk_import_button.addEventListener("click", () => {
+  let imported_files = filepond_dropzone.getFiles();
+  imported_files_total = imported_files.length;
+  
+  imported_files.forEach(imported_file => {
+    // if the imported file's extension is a pdf, search through the BBT file by its path
+    let imported_file_extension = imported_file.fileExtension;
+    
+    if (imported_file_extension == "pdf") {
+      let imported_file_path = imported_file.file.path;
+      getZoteroItems(0.0, ["attachments.path"], imported_file_path, "create");
+    }
+  });
+  exitSearch();
+});
+
+// show the import button if there are files; hide the button if there aren't any files
+filepond_dropzone.on("updatefiles", () => {
+  if (filepond_dropzone.getFiles().length > 0) {
+    bulk_import_button.style.display = "block";
+    search_bar.blur();
+  }
+  else {
+    bulk_import_button.style.display = "none";
+    search_bar.focus();
+  }
+});
+
 // ref to display zotero results after there's no more typing: https://stackoverflow.com/questions/4220126/run-javascript-function-when-user-finishes-typing-instead-of-on-key-up (user: Grace.io)
 search_bar.addEventListener("input", () => {
   clearSearchResults();
@@ -62,16 +112,21 @@ search_bar.addEventListener("input", () => {
   typingTimer = setDriftlessTimeout(() => searchZoteroItems("search"), 750);
 });
 
-// FIX: use arrow keys to go up/down the search results list
+// TODO: fix behavior of using arrow keys to go up/down the search results list
 // refs:
 // https://codepen.io/mehuldesign/pen/eYpbXMg?editors=0100
 // https://stackoverflow.com/questions/33790668/arrow-keys-navigation-through-li-no-jquery
 // https://stackoverflow.com/questions/8902787/navigate-through-list-using-arrow-keys-javascript-jq
 
 search_bar.addEventListener("keydown", function (e) {
+  if (search_bar.value != "") {
+    filepond_container.style.display = "none";
+  }
+
   // remove all search results when the search bar is empty
-  if ((e.key == "Backspace") && (search_bar.value == "")) {
+  else if ((e.key == "Backspace") && (search_bar.value == "")) {
     clearSearchResults();
+    filepond_container.style.display = "block";
   }
 
   // down arrow
@@ -524,8 +579,31 @@ function zoteroTemplates(item) {
         redirect: false,
         createFirstBlock: false
       });
-      logseq.Editor.insertAtEditingCursor(`[[${page_title}]]`);
-      logseq.Editor.exitEditingMode();
+
+      // FIX: maybe use insertbatchblock for bulk importing?
+      if (imported_files_index == 0) {
+        logseq.Editor.insertAtEditingCursor(`[[${page_title}]]`);
+        logseq.Editor.exitEditingMode();
+
+        imported_files_index++;
+      }
+      else {
+        logseq.Editor.getCurrentPageBlocksTree().then(current_page_blocks => {
+          logseq.Editor.insertBlock(current_page_blocks[current_page_blocks.length - 1].uuid, `[[${page_title}]]`, {
+            before: false,
+            sibling: true
+          });
+
+          setDriftlessTimeout(() => {
+            logseq.Editor.exitEditingMode();
+          }, 50);
+
+          // show a message after the last item of multiple items is added
+          if (imported_files_index == imported_files_total - 1) {
+            logseq.UI.showMsg(`Logtero: Successfully added ${imported_files_total} Zotero items`);
+          }
+        });
+      }
     }
     else if (input_type == "slash command - pandoc citation") {
       let pandoc_citation = `[${zotero_item.citekey}]`;
@@ -652,6 +730,7 @@ function exitSearch() {
   logseq.hideMainUI();
   search_bar.value = "";
   search_bar.blur();
+  filepond_dropzone.removeFiles();
   clearSearchResults();
 }
 
@@ -733,7 +812,7 @@ const main = async () => {
 
   // slash commands
   (function registerSlashCommands() {    
-    logseq.Editor.registerSlashCommand("Logtero: Add a Zotero item", async () => {
+    logseq.Editor.registerSlashCommand("Logtero: Add Zotero item(s)", async () => {
       input_type = "slash command";
       logseq.showMainUI();
       search_bar.focus();
@@ -749,7 +828,7 @@ const main = async () => {
   // command palette
   logseq.App.registerCommandPalette({
     key: "logseq-logtero",
-    label: "Logtero: Add a Zotero item",
+    label: "Logtero: Add Zotero item(s)",
     keybinding: {
       binding: logseq.settings.KeyboardShortcut,
       mode: "global",

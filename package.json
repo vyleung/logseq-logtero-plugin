@@ -16,6 +16,8 @@
   "dependencies": {
     "@logseq/libs": "^0.0.6",
     "driftless": "^2.0.3",
+    "filepond": "^4.30.4",
+    "filepond-plugin-file-validate-type": "^1.2.8",
     "fuse.js": "^6.6.2"
   },
   "devDependencies": {
